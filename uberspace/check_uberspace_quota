@@ -1,0 +1,27 @@
+#! /bin/bash
+
+WARN=90
+CRIT=95
+
+# Extract usedmb from report
+usedmb=$(uberspace-show-quota | tail -n 1 | cut -d":" -f2 | tr -d '[:space:]' 2>/dev/null )
+usedpercent=$(( $usedmb/100 ))
+
+output="Used $usedmb mb from 10.000 mb / $usedpercent %" 
+
+if [ $usedpercent -ge $CRIT ]
+then
+	echo "CRIT - $output"
+	exit 2
+elif [ $usedpercent -ge $WARN ]
+then
+	echo "WARN - $output"
+	exit 1
+elif [ $usedpercent -ge 0 ]
+then
+	echo "OK - $output"
+	exit 0
+else
+	echo "UNKNOWN- $output"
+	exit 3
+fi
